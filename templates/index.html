@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+</head>
+<body>
+    <h2>Upload a File</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="name">Your Name:</label>
+        <input type="text" name="name" required>
+
+        <label for="time">Upload Time (HH:MM):</label>
+        <input type="time" name="time" required>
+
+        <label for="sftp_user">SFTP User:</label>
+        <select name="sftp_user">
+            <option value="lucida">lucida</option>
+            <option value="gioi">gioi</option>
+            <option value="glv-p5">glv-p5</option>
+            <option value="peewee-baby">peewee-baby</option>
+            <option value="glv">glv</option>
+        </select>
+
+        <input type="file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Pending Uploads</h2>
+    <ul>
+        {% for upload in uploads %}
+            <li>{{ upload.name }} - {{ upload.filename }} ({{ upload.time }}) - {{ upload.status }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Admin Actions</h2>
+    <form method="POST" action="/flush">
+        <label for="flush_password">Admin Password:</label>
+        <input type="password" name="flush_password" required>
+        <button type="submit">Flush Uploads</button>
+    </form>
+
+    <h2>Update SFTP Password</h2>
+    <form method="POST" action="/update-password">
+        <label for="new_password">New SFTP Password (Optional):</label>
+        <input type="password" name="new_password">
+        <button type="submit">Update Password</button>
+    </form>
+
+</body>
+</html>
