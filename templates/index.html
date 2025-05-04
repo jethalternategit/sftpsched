@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,59 +6,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload File</title>
 </head>
-<body>
-    <h2>Upload a File</h2>
+<body style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; color: #333;">
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    <div style="max-width: 700px; margin: auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
 
-    <form method="POST" enctype="multipart/form-data">
-        <label for="name">Your Name:</label>
-        <input type="text" name="name" required>
+        <h2 style="text-align: center; color: #007bff;">📁 Upload a File</h2>
 
-        <label for="time">Upload Time (HH:MM):</label>
-        <input type="time" name="time" required>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="list-style: none; padding: 0;">
+                    {% for message in messages %}
+                        <li style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #c3e6cb;">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-        <label for="sftp_user">SFTP User:</label>
-        <select name="sftp_user">
-            <option value="lucida">lucida</option>
-            <option value="gioi">gioi</option>
-            <option value="glv-p5">glv-p5</option>
-            <option value="peewee-baby">peewee-baby</option>
-            <option value="glv">glv</option>
-        </select>
+        <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 12px;">
+            <label>Your Name:
+                <input type="text" name="name" required style="width: 100%; padding: 8px;">
+            </label>
 
-        <input type="file" name="file" required>
-        <button type="submit">Upload</button>
-    </form>
+            <label>Upload Time (HH:MM):
+                <input type="time" name="time" required style="width: 100%; padding: 8px;">
+            </label>
 
-    <h2>Pending Uploads</h2>
-    <ul>
-        {% for upload in uploads %}
-            <li>{{ upload.name }} - {{ upload.filename }} ({{ upload.time }}) - {{ upload.status }}</li>
-        {% endfor %}
-    </ul>
+            <label>SFTP User:
+                <select name="sftp_user" style="width: 100%; padding: 8px;">
+                    <option value="lucida">lucida</option>
+                    <option value="gioi">gioi</option>
+                    <option value="glv-p5">glv-p5</option>
+                    <option value="peewee-baby">peewee-baby</option>
+                    <option value="glv">glv</option>
+                </select>
+            </label>
 
-    <h2>Admin Actions</h2>
-    <form method="POST" action="/flush">
-        <label for="flush_password">Admin Password:</label>
-        <input type="password" name="flush_password" required>
-        <button type="submit">Flush Uploads</button>
-    </form>
+            <label>Select File:
+                <input type="file" name="file" required style="padding: 8px;">
+            </label>
 
-    <h2>Update SFTP Password</h2>
-    <form method="POST" action="/update-password">
-        <label for="new_password">New SFTP Password (Optional):</label>
-        <input type="password" name="new_password">
-        <button type="submit">Update Password</button>
-    </form>
+            <button type="submit" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Upload
+            </button>
+        </form>
 
+        <h2 style="margin-top: 40px; color: #343a40;">⏳ Pending Uploads</h2>
+        <ul style="padding-left: 20px;">
+            {% for upload in uploads %}
+                <li>{{ upload.name }} - <strong>{{ upload.filename }}</strong> ({{ upload.time }}) - <em>{{ upload.status }}</em></li>
+            {% endfor %}
+        </ul>
+
+        <h2 style="margin-top: 40px; color: #343a40;">🔒 Admin Actions</h2>
+        <form method="POST" action="/flush" style="display: flex; flex-direction: column; gap: 10px;">
+            <label>Admin Password:
+                <input type="password" name="flush_password" required style="width: 100%; padding: 8px;">
+            </label>
+            <button type="submit" style="padding: 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Flush Uploads
+            </button>
+        </form>
+
+        <h2 style="margin-top: 40px; color: #343a40;">🔑 Update SFTP Password</h2>
+        <form method="POST" action="/update-password" style="display: flex; flex-direction: column; gap: 10px;">
+            <label>New SFTP Password (Optional):
+                <input type="password" name="new_password" style="width: 100%; padding: 8px;">
+            </label>
+            <button type="submit" style="padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Update Password
+            </button>
+        </form>
+    </div>
 </body>
 </html>
