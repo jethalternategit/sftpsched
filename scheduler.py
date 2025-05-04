@@ -57,13 +57,18 @@ def check_and_upload():
     log("🔍 Checking for scheduled uploads...")
 
     for upload in uploads:
-        if upload["status"] != "pending":
+        status = upload.get("status", "pending")
+
+        if status != "pending":
+            log(f"🔁 Skipping {upload['filename']} — already marked as '{status}'")
             continue
 
         try:
             scheduled_time = datetime.strptime(upload["time"], "%Y-%m-%d %H:%M")
         except ValueError:
             log(f"❌ Invalid time format in entry: {upload}")
+            upload["status"] = "failed"
+            updated = True
             continue
 
         log(f"⏱️ Scheduled: {scheduled_time} | Now: {now} | File: {upload['filename']}")
@@ -80,15 +85,21 @@ def check_and_upload():
                 )
                 if success:
                     upload["status"] = "uploaded"
-                    updated = True
+                else:
+                    upload["status"] = "failed"
+                updated = True
             else:
                 log(f"⚠️ File not found: {file_path}")
+                upload["status"] = "failed"
+                updated = True
         else:
             log(f"⏳ Waiting for time. Not yet: {upload['filename']}")
 
     if updated:
         log("💾 Saving upload status updates...")
         save_uploads(uploads)
+    else:
+        log("📁 No updates to save.")
 
 if __name__ == "__main__":
     log("✅ Scheduler started. Checking for uploads every 15 seconds...")
