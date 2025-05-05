@@ -3,6 +3,8 @@ import json
 import time
 from datetime import datetime
 import paramiko
+import pytz  # ⏰ Timezone support
+from dateutil import parser  # 🔍 Flexible datetime parsing
 
 UPLOAD_FOLDER = "uploads"
 UPLOADS_JSON = "uploads.json"
@@ -10,9 +12,10 @@ CONFIG_FILE = "config.json"
 SFTP_HOST = "upload.rakuten.ne.jp"
 SFTP_PORT = 22
 SFTP_DIR = "/ritem/batch"
+TIMEZONE = pytz.timezone("Asia/Manila")  # 🇵🇭 Manila Time
 
 def log(msg):
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}", flush=True)
+    print(f"[{datetime.now(TIMEZONE).strftime('%Y-%m-%d %H:%M:%S')}] {msg}", flush=True)
 
 def load_config():
     if os.path.exists(CONFIG_FILE):
@@ -52,7 +55,7 @@ def check_and_upload():
     uploads = load_uploads()
     config = load_config()
     updated = False
-    now = datetime.now()
+    now = datetime.now(TIMEZONE)
 
     log("🔍 Checking for scheduled uploads...")
 
@@ -64,9 +67,13 @@ def check_and_upload():
             continue
 
         try:
-            scheduled_time = datetime.strptime(upload["time"], "%Y-%m-%d %H:%M")
-        except ValueError:
-            log(f"❌ Invalid time format in entry: {upload}")
+            parsed_time = parser.parse(upload["time"])
+            if parsed_time.tzinfo is None:
+                scheduled_time = TIMEZONE.localize(parsed_time)  # Assume Manila
+            else:
+                scheduled_time = parsed_time.astimezone(TIMEZONE)
+        except (ValueError, TypeError) as e:
+            log(f"❌ Invalid time format in entry ({upload.get('filename', 'unknown')}): {e}")
             upload["status"] = "failed"
             updated = True
             continue
@@ -83,10 +90,7 @@ def check_and_upload():
                     upload["sftp_user"],
                     config["SFTP_PASS"]
                 )
-                if success:
-                    upload["status"] = "uploaded"
-                else:
-                    upload["status"] = "failed"
+                upload["status"] = "uploaded" if success else "failed"
                 updated = True
             else:
                 log(f"⚠️ File not found: {file_path}")
