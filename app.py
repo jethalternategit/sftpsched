@@ -2,6 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, flash, url_for
+from waitress import serve
 
 UPLOAD_FOLDER = "uploads"
 UPLOADS_JSON = "uploads.json"
@@ -92,4 +93,4 @@ def update_password():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    serve(app, host="0.0.0.0", port=61591)
